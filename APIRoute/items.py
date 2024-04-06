@@ -1,8 +1,10 @@
 from typing import Union, List
+import time
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Body
 
 from ObjectModel import Item
+from ObjectModel.data import User, Image
 
 items_route = APIRouter(prefix='/items', tags=["items"])
 
@@ -15,7 +17,7 @@ async def items_all():
 
 @items_route.get("/get_{item_id}")
 # async def read_item(item_id: str, q: str | None = None):
-async def get_item(item_id: str, q: Union[str, None] = None):
+async def get_item(item_id: str, q: str | None = None):
     # python3.10支持 类型 | 类型
     # python3.8需要写成 Union[str, None]
     # = None代表该参数可选
@@ -25,7 +27,7 @@ async def get_item(item_id: str, q: Union[str, None] = None):
 
 
 # 通用匹配一般放在最后
-@items_route.get('/{item_id}')
+@items_route.get('/cal_{item_id}')
 async def items(item_id: int):
     return item_id ** item_id
 
@@ -42,7 +44,8 @@ async def read_items(
 ):
     # 不带有Query的参数会从请求体中解析
     # 带有Query的参数会从请求路由? & &中解析
-    # Query不添加default代表必填 请求体不添加=代表必填
+    # Query不添加default代表必填 请求体不添加=xx(具体值)代表必填
+    # 如果是=C()那么不需要添加default字段才代表必填数值
     # List类型的不要设置default要设置成元组
     # Query的参数可以设置别名alias
     results = {
@@ -65,6 +68,7 @@ async def read_items(
 
 @items_route.post('/')
 async def create_item(item: Item):
+    # 只有一个自定义类的时候 请求体中不需要包含item字段名称 直接传入item所需的属性即可
     # item称之为请求体 请求体一般采用数据模型进行接收
     # 函数中元类型的参数称之为请求参数
     # 路由中的{arg}称之为路径参数
@@ -72,3 +76,22 @@ async def create_item(item: Item):
     return item
 
 
+@items_route.post('/create_image')
+def create_image(image: Image | None = Body(default=None, embed=True)):
+    # embed参数为True的时候要求在最外层包过一个字段名称（多了一层） 一般不用这种操作
+    print(image)
+    # = xx 和 C(default=xx) 代表这个参数可以选择性传递如果不传递的话，默认值就是xx
+    # Type | None 会在文档中显示可以传入空值
+    # 如果没有default表示必须要显示传入Type | None
+    return image
+
+
+@items_route.post('/create')
+async def create_item(
+        desc: int, item: Item,
+        user: User,
+        other_body_field: int = Body(alias="abc")
+):
+    # 不带有Body()的默认从请求路由中进行解析
+    # 带有Body和自定义类的从请求体中进行解析
+    return {'item': item, 'user': user, 'desc': desc, 'other_body_field': other_body_field}
