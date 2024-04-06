@@ -11,6 +11,9 @@ app = FastAPI(title="接口文档", version="1.0.0")
 @app.get('/')
 @auth_require
 async def root(request: Request, a: int = Query(default=0, ge=1)):
+    # 其实可以直接传入access_token和x_real_ip
+    # access_token:str = Header(None), x_real_ip:str = Header(None)
+
     # 有则检验，没有则默认值
     print(a)
     return {'msg': 'Hello FastAPI'}
