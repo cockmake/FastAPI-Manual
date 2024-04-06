@@ -1,13 +1,18 @@
-from fastapi import FastAPI, Request, Header
+from functools import wraps
+
+from fastapi import FastAPI, Request, Header, Query
 from APIRoute import items_route, models_route, users_route
 from ObjectModel.data import TimeDate
+from request_wraps import auth_require
 
 app = FastAPI(title="接口文档", version="1.0.0")
 
 
 @app.get('/')
-async def root(request: Request):
-    print(request.client.host)
+@auth_require
+async def root(request: Request, a: int = Query(default=0, ge=1)):
+    # 有则检验，没有则默认值
+    print(a)
     return {'msg': 'Hello FastAPI'}
 
 @app.post('/header_test')
