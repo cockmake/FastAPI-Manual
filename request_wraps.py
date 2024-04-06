@@ -3,7 +3,10 @@ from fastapi import Request
 
 def auth_require(func):
     @wraps(func)
-    async def wrapper(request: Request, *args, **kwargs):
+    async def wrapper(request, *args, **kwargs):
+        # 如果不带有request参数，可以使用下面的方式获取
+        # request = kwargs['request']
+
         # 注意async def
         print(request.headers)
         print(args, kwargs)
