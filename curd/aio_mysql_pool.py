@@ -1,3 +1,5 @@
+from typing import Union
+
 import aiomysql
 
 from settings import MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_PORT, MYSQL_DATABASE, MYSQL_POOL_SIZE
@@ -14,7 +16,7 @@ class MYSQLOP:
         # 用户可以修改的字段、允许插入、删除的表
         self.user_fields_table = "user_fields_table"  # 用户可以修改的字段表 （还包括增、删两个权限）
 
-        self.mysql_pool: aiomysql.Pool | None = None
+        self.mysql_pool: Union[aiomysql.Pool, None] = None
 
     async def init_pool(self):
         self.mysql_pool = await aiomysql.create_pool(

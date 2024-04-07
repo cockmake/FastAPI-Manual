@@ -10,7 +10,7 @@ class Item(BaseModel):
     description: Union[str, None] = None
     # 这样写 时间是固定的 不是动态的
     # 要在实例化的时候进行修改
-    cur_t: datetime | None = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cur_t: Union[datetime, None] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # 添加整个测试实例到文档中
     model_config = {
@@ -43,14 +43,14 @@ class User(BaseModel):
 class Image(BaseModel):
     filename: str
     file_type: str = Field(default='jpg')
-    owner: User | None = None
+    owner: Union[User, None] = None
 
 class TimeDate(BaseModel):
-    date_: date | None = Field(default=None, examples=["2024-04-07"])
-    time_: time | None = Field(default=None, examples=["12:00:00"])
-    datetime_: datetime | None = Field(default=None, examples=["2024-04-07 12:00:00"])
+    date_: Union[date, None] = Field(default=None, examples=["2024-04-07"])
+    time_: Union[time, None] = Field(default=None, examples=["12:00:00"])
+    datetime_: Union[datetime, None] = Field(default=None, examples=["2024-04-07 12:00:00"])
     # random valid timedelta
-    timedelta_: timedelta | None = Field(default=None, examples=["1 days, 02:03:04"])
+    timedelta_: Union[timedelta, None] = Field(default=None, examples=["1 days, 02:03:04"])
 
 class BaseItem(BaseModel):
     description: str

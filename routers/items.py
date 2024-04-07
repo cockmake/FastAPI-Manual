@@ -16,7 +16,7 @@ async def items_all():
 
 @items_route.get("/get_{item_id}")
 # async def read_item(item_id: str, q: str | None = None):
-async def get_item(item_id: str, q: str | None = None):
+async def get_item(item_id: str, q: Union[str, None] = None):
     # python3.10支持 类型 | 类型
     # python3.8需要写成 Union[str, None]
     # = None代表该参数可选
@@ -76,7 +76,7 @@ async def create_item(item: Item):
 
 
 @items_route.post('/create_image')
-async def create_image(image: Image | None = Body(default=None, embed=True)):
+async def create_image(image: Union[Image, None] = Body(default=None, embed=True)):
     # embed参数为True的时候要求在最外层包过一个字段名称（多了一层） 一般不用这种操作
     print(image)
     # = xx 和 C(default=xx) 代表这个参数可以选择性传递如果不传递的话，默认值就是xx
