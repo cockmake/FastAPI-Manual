@@ -3,7 +3,7 @@ import aiofiles
 from datetime import time
 
 import aiofiles
-from fastapi import APIRouter, Form, UploadFile, Depends, Body, Request
+from fastapi import APIRouter, Form, UploadFile, Depends, Body, Request, BackgroundTasks
 from starlette.responses import FileResponse
 
 from dependencies import AccessTimeLimitDepend, AccessBeforeLimitDepend
@@ -85,3 +85,15 @@ async def user_upload(file_a: UploadFile, username: str = Form(description="额�
     # shutil.copyfileobj(file_a.file, open(file_a.filename, 'wb'))
     print(username)
     return username
+
+async def write_file_task():
+    async with aiofiles.open('a.txt', 'w') as f:
+        for i in range(10000):
+            await f.write('Hello FastAPI\n')
+@users_route.post('/write_file')
+async def write_file(bk_task: BackgroundTasks):
+    # 后台任务
+    # 在请求需要使用的地方导入BackgroundTasks即可
+    # 包括依赖项
+    bk_task.add_task(write_file_task)
+    return {"msg": "success"}
