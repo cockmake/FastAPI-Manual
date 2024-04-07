@@ -88,8 +88,11 @@ async def user_upload(file_a: UploadFile, username: str = Form(description="额�
 
 async def write_file_task():
     async with aiofiles.open('a.txt', 'w') as f:
-        for i in range(10000):
+        for i in range(1000):
             await f.write('Hello FastAPI\n')
+async def send_email_to():
+    pass
+
 @users_route.post('/write_file')
 async def write_file(bk_task: BackgroundTasks):
     # 后台任务
