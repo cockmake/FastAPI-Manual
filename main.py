@@ -4,12 +4,15 @@ from fastapi import FastAPI, Request, Header, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 
+from dependencies import lifespan
 from entity.data import TimeDate, Item
 from routers import items_route, models_route, users_route
 
-app = FastAPI(title="接口文档", version="1.0.0", redoc_url=None)
 # dependencies=[] 可以设置全局依赖
 # APIRouter同样可以设置
+
+
+app = FastAPI(title="接口文档", version="1.0.0", redoc_url=None, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

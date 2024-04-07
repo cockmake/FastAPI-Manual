@@ -1,15 +1,17 @@
 from datetime import time
 import aiofiles
 from datetime import time
-
+import time as sys_time
 import aiofiles
 from fastapi import APIRouter, Form, UploadFile, Depends, Body, Request, BackgroundTasks
 from starlette.responses import FileResponse
-
+from redis import asyncio as aioredis
 from dependencies import AccessTimeLimitDepend, AccessBeforeLimitDepend
 from entity.data import User, Item
+from curd import aio_redis_pool, aio_mysql_pool
+from utils import generate_token, get_operation_description
 
-users_route = APIRouter(prefix='/users', tags=["users"])
+users_route = APIRouter(prefix='/user', tags=["user"])
 
 
 @users_route.post(
@@ -100,3 +102,33 @@ async def write_file(bk_task: BackgroundTasks):
     # 包括依赖项
     bk_task.add_task(write_file_task)
     return {"msg": "success"}
+
+@users_route.post('/login')
+async def user_login(username: str = Body(), password: str = Body()):
+    user_info = await aio_mysql_pool.query_user_info_from_username(username)
+    if not user_info:
+        return {"msg": "用户名不存在或在审核中！", "type": "error"}
+    password_db = user_info['password']
+    if password != password_db:
+        return {"msg": "密码错误！", "type": "error"}
+    user_type = user_info['operation_type']
+    day_access = 3
+    cur_t = int(sys_time.time())
+    time_to_live = day_access * 24 * 60 * 60
+    token = generate_token(username, cur_t, time_to_live, user_type=user_type)
+    name = user_info['name']
+    # 把该用户的权限写入redis
+    # 根据用户名查询权限
+    privilege = await aio_mysql_pool.get_user_privilege(username, name)  # privilege 是 dict 包含了username name 权限
+    async with aioredis.Redis(connection_pool=aio_redis_pool) as redis_op:
+        # 以token为key 需要写入字段 用户名 姓名 *权限 操作类型
+        # 最后设置过期时间
+        await redis_op.hset(token, mapping=privilege)
+        await redis_op.hset(token, "operation_type", user_type)
+        await redis_op.expire(token, time_to_live)
+    # 写入登录日志
+    login_desc = get_operation_description(name, "登录", [])
+    # 将信息登录日志写入数据库
+    await aio_mysql_pool.write_operation_log(username, "登录", login_desc)
+    return {"msg": "登录成功！", "type": "success", "access_token": token, "username": username,
+            "name": name, "operation_type": user_type, 'privilege': privilege}
