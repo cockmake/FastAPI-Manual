@@ -1,10 +1,9 @@
 from typing import Union, List
-import time
 
 from fastapi import APIRouter, Query, Body
 
-from ObjectModel import Item
-from ObjectModel.data import User, Image
+from entity import Item
+from entity.data import User, Image
 
 items_route = APIRouter(prefix='/items', tags=["items"])
 
@@ -77,7 +76,7 @@ async def create_item(item: Item):
 
 
 @items_route.post('/create_image')
-def create_image(image: Image | None = Body(default=None, embed=True)):
+async def create_image(image: Image | None = Body(default=None, embed=True)):
     # embed参数为True的时候要求在最外层包过一个字段名称（多了一层） 一般不用这种操作
     print(image)
     # = xx 和 C(default=xx) 代表这个参数可以选择性传递如果不传递的话，默认值就是xx

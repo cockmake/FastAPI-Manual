@@ -8,6 +8,9 @@ class Item(BaseModel):
     price: float
     tax: Union[float, None] = None
     description: Union[str, None] = None
+    # 这样写 时间是固定的 不是动态的
+    # 要在实例化的时候进行修改
+    cur_t: datetime | None = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # 添加整个测试实例到文档中
     model_config = {
@@ -18,10 +21,12 @@ class Item(BaseModel):
                     "description": "A very nice Item",
                     "price": 35.4,
                     "tax": 3.2,
+                    "cur_t": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
             ]
         }
     }
+
 
 
 class User(BaseModel):
@@ -46,3 +51,16 @@ class TimeDate(BaseModel):
     datetime_: datetime | None = Field(default=None, examples=["2024-04-07 12:00:00"])
     # random valid timedelta
     timedelta_: timedelta | None = Field(default=None, examples=["1 days, 02:03:04"])
+
+class BaseItem(BaseModel):
+    description: str
+    type: str
+
+
+class CarItem(BaseItem):
+    type: str = "car"
+
+
+class PlaneItem(BaseItem):
+    size: int
+    type: str = "plane"

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from ObjectModel import ModelName
+from entity import ModelName
 
 models_route = APIRouter(prefix='/models', tags=["models"])
 
