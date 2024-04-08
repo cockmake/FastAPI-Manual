@@ -1,9 +1,9 @@
 from redis import asyncio as aioredis
 
-from settings import REDIS_POOL_SIZE, REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_PASSWORD
+from settings import REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_PASSWORD
 
 REDIS_CONFIG = {
-    # "max_connections": REDIS_POOL_SIZE,  # 最大连接数比最大可工作线程数多1
+    # "max_connections": None,  # 一般不用设置
     "host": REDIS_HOST,
     "port": REDIS_PORT,
     "db": REDIS_DB,
