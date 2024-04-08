@@ -1,3 +1,3 @@
 # 最好搭配异步MYSQL, REDIS, MONOGDB等数据库使用
-from .aio_mysql_pool import aio_mysql_pool
-from .aio_redis_pool import aio_redis_pool
+from .mysql_pool import mysql_pool
+from .redis_pool_aio import redis_pool_aio

@@ -27,8 +27,9 @@ class MYSQLOP:
             db=MYSQL_DATABASE,
             minsize=MYSQL_POOL_SIZE // 2,
             maxsize=MYSQL_POOL_SIZE,
-            cursorclass=aiomysql.cursors.DictCursor
+            cursorclass=aiomysql.cursors.DictCursor,
         )
+
     async def query_user_info_from_username(self, username):
         # 根据用户名查询用户信息
         # 如果存在返回用户信息
@@ -65,5 +66,4 @@ class MYSQLOP:
             return False
 
 
-
-aio_mysql_pool = MYSQLOP()
+mysql_pool_aio = MYSQLOP()

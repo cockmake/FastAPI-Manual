@@ -1,14 +1,14 @@
-from datetime import time
-import aiofiles
-from datetime import time
 import time as sys_time
+from datetime import time
+
 import aiofiles
 from fastapi import APIRouter, Form, UploadFile, Depends, Body, Request, BackgroundTasks
-from starlette.responses import FileResponse
 from redis import asyncio as aioredis
+from starlette.responses import FileResponse
+
+from curd import redis_pool_aio, mysql_pool
 from dependencies import AccessTimeLimitDepend, AccessBeforeLimitDepend
 from entity.data import User, Item
-from curd import aio_redis_pool, aio_mysql_pool
 from utils import generate_token, get_operation_description
 
 users_route = APIRouter(prefix='/user', tags=["user"])
@@ -47,6 +47,7 @@ async def user_image():
     # 并且可以弹出下载框
     return FileResponse('a.jpg', media_type='image/jpg',
                         headers={'Content-Disposition': 'attachment; filename=a.jpg'})
+
 
 @users_route.post('/upload/stream')
 async def user_upload_stream(request: Request):
@@ -88,12 +89,16 @@ async def user_upload(file_a: UploadFile, username: str = Form(description="额�
     print(username)
     return username
 
+
 async def write_file_task():
     async with aiofiles.open('a.txt', 'w') as f:
         for i in range(1000):
             await f.write('Hello FastAPI\n')
+
+
 async def send_email_to():
     pass
+
 
 @users_route.post('/write_file')
 async def write_file(bk_task: BackgroundTasks):
@@ -103,9 +108,10 @@ async def write_file(bk_task: BackgroundTasks):
     bk_task.add_task(write_file_task)
     return {"msg": "success"}
 
+
 @users_route.post('/login')
 async def user_login(username: str = Body(), password: str = Body()):
-    user_info = await aio_mysql_pool.query_user_info_from_username(username)
+    user_info = mysql_pool.query_user_info_from_username(username)
     if not user_info:
         return {"msg": "用户名不存在或在审核中！", "type": "error"}
     password_db = user_info['password']
@@ -119,8 +125,8 @@ async def user_login(username: str = Body(), password: str = Body()):
     name = user_info['name']
     # 把该用户的权限写入redis
     # 根据用户名查询权限
-    privilege = await aio_mysql_pool.get_user_privilege(username, name)  # privilege 是 dict 包含了username name 权限
-    async with aioredis.Redis(connection_pool=aio_redis_pool) as redis_op:
+    privilege = mysql_pool.get_user_privilege(username, name)  # privilege 是 dict 包含了username name 权限
+    async with aioredis.Redis(connection_pool=redis_pool_aio) as redis_op:
         # 以token为key 需要写入字段 用户名 姓名 *权限 操作类型
         # 最后设置过期时间
         await redis_op.hset(token, mapping=privilege)
@@ -129,6 +135,6 @@ async def user_login(username: str = Body(), password: str = Body()):
     # 写入登录日志
     login_desc = get_operation_description(name, "登录", [])
     # 将信息登录日志写入数据库
-    await aio_mysql_pool.write_operation_log(username, "登录", login_desc)
+    mysql_pool.write_operation_log(username, "登录", login_desc)
     return {"msg": "登录成功！", "type": "success", "access_token": token, "username": username,
             "name": name, "operation_type": user_type, 'privilege': privilege}

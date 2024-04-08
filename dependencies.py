@@ -4,16 +4,12 @@ from typing import Tuple
 
 from fastapi import Header, HTTPException, Depends, FastAPI
 
-from curd import aio_mysql_pool
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 初始化aio_mysql_pool
-    await aio_mysql_pool.init_pool()
+    print("初始化进程")
     yield  # 在该上下文环境下进入下一个步骤
-    aio_mysql_pool.mysql_pool.close()
-    await aio_mysql_pool.mysql_pool.wait_closed()
+    print("关闭进程")
 
 
 # 不需要传入参数就用函数依赖即可
