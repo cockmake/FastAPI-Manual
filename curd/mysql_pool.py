@@ -13,7 +13,7 @@ class MYSQLOP:
             maxcached=MYSQL_POOL_SIZE,
             maxusage=100,  # 一个连接可以复用的次数
             ping=0,
-            maxconnections=2000,  # 连接池允许的最大连接数 不要超过数据库的限制
+            maxconnections=2000,  # 连接池允许的最大连接数 不要超过数据库的限制 一般也不用设置
             blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待。True，等待；False，不等待然后报错
             host=MYSQL_HOST,
             port=MYSQL_PORT,
