@@ -3,7 +3,7 @@ from settings import (GUNICORN_WORKERS, GUNICORN_THREADS, GUNICORN_PORT, GUNICOR
                       GUNICORN_LOGLEVEL, GUNICORN_CAPTURE_OUTPUT, GUNICORN_ERRORLOG)
 
 workers = GUNICORN_WORKERS
-worker_class = GUNICORN_WORK_CLASS
+worker_class = GUNICORN_WORK_CLASS  # FastAPI部署采用 "uvicorn.workers.UvicornWorker"
 
 threads = GUNICORN_THREADS
 

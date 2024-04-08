@@ -1,5 +1,6 @@
-from typing import Union, Set
 from datetime import datetime, date, timedelta, time
+from typing import Union, Set
+
 from pydantic import BaseModel, Field
 
 
@@ -28,7 +29,6 @@ class Item(BaseModel):
     }
 
 
-
 class User(BaseModel):
     # 模型的字段校验 别忘记可以采用regex
     username: str = Field(min_length=2, examples=["make"])
@@ -45,12 +45,14 @@ class Image(BaseModel):
     file_type: str = Field(default='jpg')
     owner: Union[User, None] = None
 
+
 class TimeDate(BaseModel):
     date_: Union[date, None] = Field(default=None, examples=["2024-04-07"])
     time_: Union[time, None] = Field(default=None, examples=["12:00:00"])
     datetime_: Union[datetime, None] = Field(default=None, examples=["2024-04-07 12:00:00"])
     # random valid timedelta
     timedelta_: Union[timedelta, None] = Field(default=None, examples=["1 days, 02:03:04"])
+
 
 class BaseItem(BaseModel):
     description: str

@@ -4,5 +4,4 @@ venv
 build
 dist
 
-settings.py
 .config.json
